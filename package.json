@@ -1,0 +1,42 @@
+{
+  "name": "cyclon.p2p",
+  "version": "0.0.1",
+  "description": "A Javascript implementation of the Cyclon peer sampling protocol",
+  "keywords": [
+    "peer",
+    "cyclon",
+    "overlay",
+    "sampling",
+    "random"
+  ],
+  "homepage": "https://gitub.com/nicktindall/cyclon/wiki",
+  "bugs": "https://github.com/nicktindall/cyclon/issues",
+  "license": "MIT",
+  "author": {
+    "name": "Nick Tindall",
+    "email": "nick@tindall.id.au",
+    "url": "http://www.tindall.id.au"
+  },
+  "contributors": [
+    {
+      "name": "Aaron Harwood",
+      "email": "aharwood@unimelb.edu.au"
+    }
+  ],
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nicktindall/cyclon.git"
+  },
+  "scripts": {
+    "test": "make test"
+  },
+  "devDependencies": {
+    "istanbul": "0.2.x",
+    "jasmine-node": "1.14.x"
+  },
+  "dependencies": {
+    "bluebird": "2.1.x",
+    "gauss": "^0.2.12"
+  }
+}
