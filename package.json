@@ -33,10 +33,10 @@
   },
   "devDependencies": {
     "istanbul": "0.2.x",
-    "jasmine-node": "1.14.x"
+    "jasmine-node": "1.14.2"
   },
   "dependencies": {
     "bluebird": "2.1.x",
-    "gauss": "^0.2.12"
+    "gauss": "0.2.12"
   }
 }
