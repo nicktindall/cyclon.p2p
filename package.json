@@ -1,6 +1,6 @@
 {
   "name": "cyclon.p2p",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "description": "A Javascript implementation of the Cyclon peer sampling protocol",
   "keywords": [
     "peer",
