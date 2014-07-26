@@ -5,7 +5,7 @@ var gauss = require("gauss");
 var NUM_NODES = 1000;
 var REPORT_INTERVAL_MS = 1000;
 
-var localComms = new cyclon.LocalComms();
+var allNodes = {};
 var localBootstrap = new cyclon.LocalBootstrap(NUM_NODES);
 var logger = new cyclon.ConsoleLogger();
 var nodes = [];
@@ -13,7 +13,7 @@ var neighbourSets = [];
 var round = 0;
 
 for (var nodeId = 0; nodeId < NUM_NODES; nodeId++) {
-    var cyclonNode = cyclon.builder(String(nodeId), localComms, localBootstrap)
+    var cyclonNode = cyclon.builder(new cyclon.LocalComms(nodeId, allNodes), localBootstrap)
     		.withTickIntervalMs(1000)
     		.withLogger(logger)
     		.build();
@@ -41,13 +41,12 @@ function tick() {
  */
 function printNetworkStatistics() {
     var counts = {};
-    var allIds = localComms.getAllIds();
 
     neighbourSets.forEach(function (neighbourSet) {
-        allIds.forEach(function (id) {
+        for(var id in allNodes) {
             var increment = neighbourSet.contains(id) ? 1 : 0;
             counts[id] = counts[id] === undefined ? increment : counts[id] + increment;
-        });
+        }
     });
 
     var countsArray = [];

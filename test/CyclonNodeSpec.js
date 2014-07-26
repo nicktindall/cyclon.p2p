@@ -22,7 +22,11 @@ describe("The Cyclon node", function () {
         OTHER_ID = 5678,
         NUM_NEIGHBOURS = 50,
         SHUFFLE_SIZE = 10,
-        POINTER_DATA = "POINTER_DATA";
+        POINTER = {
+            "id": ID,
+            "seq": 55,
+            "metadata": {}
+        };
 
     beforeEach(function () {
         requestOne = neighbour('a', 1);
@@ -42,9 +46,10 @@ describe("The Cyclon node", function () {
         asyncExecService = ClientMocks.mockAsyncExecService();
         storage = ClientMocks.mockStorage();
         metadataProviders = {};
-        comms.getPointerData.andReturn(POINTER_DATA);
+        comms.createNewPointer.andReturn(POINTER);
+        comms.getLocalId.andReturn(ID);
         comms.sendShuffleRequest.andReturn(Promise.resolve(null));
-        theNode = new CyclonNode(ID, neighbourSet, NUM_NEIGHBOURS, SHUFFLE_SIZE, comms, bootstrapper, TICK_INTERVAL_MS, metadataProviders, asyncExecService, logger, storage);
+        theNode = new CyclonNode(neighbourSet, NUM_NEIGHBOURS, SHUFFLE_SIZE, comms, bootstrapper, TICK_INTERVAL_MS, metadataProviders, asyncExecService, logger, storage);
     });
 
     it("should return it's ID", function () {
@@ -65,9 +70,7 @@ describe("The Cyclon node", function () {
         it("should send the shuffle request to the oldest peer", function () {
             theNode.executeShuffle();
 
-            expect(comms.sendShuffleRequest).toHaveBeenCalledWith(theNode, oldestNeighbour, [
-                {id: ID, age: 0, seq: 0, comms: POINTER_DATA, metadata: {}}
-            ].concat(requestSet));
+            expect(comms.sendShuffleRequest).toHaveBeenCalledWith(theNode, oldestNeighbour, [POINTER].concat(requestSet));
         });
 
         it("should increment the ages of all node pointers in the cache prior to selecting the shuffle set", function () {
@@ -211,21 +214,6 @@ describe("The Cyclon node", function () {
             expect(neighbourSet.remove).toHaveBeenCalledWith(OTHER_ID);
         });
     });
-
-
-    describe("when generating a pointer", function () {
-
-        it("should increment the sequence number each time", function () {
-
-            var pointerOne = theNode.createNewPointer();
-            var pointerTwo = theNode.createNewPointer();
-            var pointerThree = theNode.createNewPointer();
-
-            expect(pointerOne.seq).toBeLessThan(pointerTwo.seq);
-            expect(pointerTwo.seq).toBeLessThan(pointerThree.seq);
-        });
-    });
-
 
     /**
      * Convenience for building neighbours

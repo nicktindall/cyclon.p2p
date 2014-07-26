@@ -17,7 +17,11 @@ module.exports.mockNeighbourSet = function () {
 };
 
 module.exports.mockComms = function () {
-    return jasmine.createSpyObj('comms', ['sendShuffleRequest', 'sendShuffleResponse', 'getPointerData']);
+    return jasmine.createSpyObj('comms', ['sendShuffleRequest', 'sendShuffleResponse', 'createNewPointer', 'getLocalId']);
+};
+
+module.exports.mockBootstrap = function() {
+    return jasmine.createSpyObj('bootstrap', ['getInitialPeerSet']);
 };
 
 module.exports.mockStorage = function() {
