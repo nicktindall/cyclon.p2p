@@ -1,19 +1,20 @@
 'use strict';
 var cyclon = require("./lib");
 var gauss = require("gauss");
+var Util = require("cyclon.p2p-common");
 
 var NUM_NODES = 1000;
 var REPORT_INTERVAL_MS = 1000;
 
 var allNodes = {};
 var localBootstrap = new cyclon.LocalBootstrap(NUM_NODES);
-var logger = new cyclon.ConsoleLogger();
+var logger = Util.consoleLogger();
 var nodes = [];
 var neighbourSets = [];
 var round = 0;
 
 for (var nodeId = 0; nodeId < NUM_NODES; nodeId++) {
-    var cyclonNode = cyclon.builder(new cyclon.LocalComms(nodeId, allNodes), localBootstrap)
+    var cyclonNode = cyclon.builder(new cyclon.LocalComms(String(nodeId), allNodes), localBootstrap)
     		.withTickIntervalMs(1000)
     		.withLogger(logger)
     		.build();
