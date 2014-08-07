@@ -143,17 +143,6 @@ describe("The neighbour set", function() {
         expect(theSet.size()).toBe(1);
     });
 
-    it("should reset the specified neighbour's age to zero", function() {
-
-        theSet.insert(createNeighbour('a', 1));
-        theSet.insert(createNeighbour('b', 2));
-
-        theSet.resetAge('b');
-
-        expect(theSet.get('b').age).toBe(0);
-    });
-
-
     describe("when merging a node pointer", function() {
 
         var oldNode = {id: 10, age: 100, seq: 5, comms: "OLD_COMMS", metadata: "OLD_METADATA"};
