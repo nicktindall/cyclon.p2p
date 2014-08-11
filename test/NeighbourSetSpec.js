@@ -184,7 +184,7 @@ describe("The neighbour set", function() {
             theSet.on("change", changeListener);
 
             theSet.mergeNodePointerIfNewer(newNode);
-            expect(changeListener).toHaveBeenCalledWith("update");
+            expect(changeListener).toHaveBeenCalledWith("update", newNode);
         });
 
         it("should not fire a change event when no node is updated", function() {
