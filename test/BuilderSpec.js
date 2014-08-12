@@ -26,11 +26,15 @@ describe("The cyclon-lib export", function() {
 			expect(cyclon.builder(comms, bootstrap).withLogger(Utils.consoleLogger()).build() instanceof cyclon.CyclonNode).toBeTruthy();
 		});
 
-		it("allows specification of the numbef of neigbours", function() {
+		it("allows specification of the number of neigbours", function() {
 			expect(cyclon.builder(comms, bootstrap).withNumNeighbours(10).build() instanceof cyclon.CyclonNode).toBeTruthy();
 		});
 
-		it("allows specification of the shuffle size", function() {
+        it("allows specification of the bootstrap size", function() {
+            expect(cyclon.builder(comms, bootstrap).withBootstrapSize(10).build() instanceof cyclon.CyclonNode).toBeTruthy();
+        });
+
+        it("allows specification of the shuffle size", function() {
 			expect(cyclon.builder(comms, bootstrap).withShuffleSize(10).build() instanceof cyclon.CyclonNode).toBeTruthy();
 		});
 

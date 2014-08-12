@@ -14,7 +14,7 @@ describe("The Cyclon node", function () {
         comms,
         logger,
         storage,
-        bootstrapper,
+        bootstrap,
         metadataProviders,
         asyncExecService,
         TICK_INTERVAL_MS = 3000,
@@ -22,6 +22,7 @@ describe("The Cyclon node", function () {
         OTHER_ID = 5678,
         NUM_NEIGHBOURS = 50,
         SHUFFLE_SIZE = 10,
+        BOOTSTRAP_SIZE = 66,
         POINTER = {
             "id": ID,
             "seq": 55,
@@ -40,22 +41,34 @@ describe("The Cyclon node", function () {
         requestSet = [requestOne, requestTwo, requestThree];
         responseSet = [responseOne, responseTwo, responseThree];
 
+        bootstrap = ClientMocks.mockBootstrap();
         neighbourSet = ClientMocks.mockNeighbourSet();
         comms = ClientMocks.mockComms();
         logger = ClientMocks.mockLoggingService();
         asyncExecService = ClientMocks.mockAsyncExecService();
         storage = ClientMocks.mockStorage();
         metadataProviders = {};
+        bootstrap.getInitialPeerSet.andReturn(Promise.resolve([POINTER]));
         comms.createNewPointer.andReturn(POINTER);
         comms.getLocalId.andReturn(ID);
         comms.sendShuffleRequest.andReturn(Promise.resolve(null));
-        theNode = new CyclonNode(neighbourSet, NUM_NEIGHBOURS, SHUFFLE_SIZE, comms, bootstrapper, TICK_INTERVAL_MS, metadataProviders, asyncExecService, logger, storage);
+        theNode = new CyclonNode(neighbourSet, NUM_NEIGHBOURS, BOOTSTRAP_SIZE, SHUFFLE_SIZE, comms, bootstrap, TICK_INTERVAL_MS, metadataProviders, asyncExecService, logger, storage);
     });
 
     it("should return it's ID", function () {
         expect(theNode.getId()).toBe(ID);
     });
 
+    describe("when the neighbour set is empty", function() {
+
+        it("should stop shuffling and attempt to bootstrap", function() {
+
+            theNode.executeShuffle();
+
+            expect(asyncExecService.clearInterval).toHaveBeenCalled();
+            expect(bootstrap.getInitialPeerSet).toHaveBeenCalledWith(theNode, BOOTSTRAP_SIZE);
+        });
+    });
 
     describe("when initiating a shuffle", function () {
 
