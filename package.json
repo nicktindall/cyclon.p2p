@@ -32,11 +32,11 @@
     "test": "make test"
   },
   "devDependencies": {
-    "istanbul": "0.2.x",
-    "jasmine-node": "1.14.2"
+    "istanbul": "0.3.x",
+    "jasmine-node": "2.0.x"
   },
   "dependencies": {
-    "cyclon.p2p-common": "0.0.2",
+    "cyclon.p2p-common": "0.0.3",
     "bluebird": "2.1.x",
     "gauss": "0.2.12"
   }

@@ -48,10 +48,10 @@ describe("The Cyclon node", function () {
         asyncExecService = ClientMocks.mockAsyncExecService();
         storage = ClientMocks.mockStorage();
         metadataProviders = {};
-        bootstrap.getInitialPeerSet.andReturn(Promise.resolve([POINTER]));
-        comms.createNewPointer.andReturn(POINTER);
-        comms.getLocalId.andReturn(ID);
-        comms.sendShuffleRequest.andReturn(Promise.resolve(null));
+        bootstrap.getInitialPeerSet.and.returnValue(Promise.resolve([POINTER]));
+        comms.createNewPointer.and.returnValue(POINTER);
+        comms.getLocalId.and.returnValue(ID);
+        comms.sendShuffleRequest.and.returnValue(Promise.resolve(null));
         theNode = new CyclonNode(neighbourSet, NUM_NEIGHBOURS, BOOTSTRAP_SIZE, SHUFFLE_SIZE, comms, bootstrap, TICK_INTERVAL_MS, metadataProviders, asyncExecService, logger, storage);
     });
 
@@ -75,9 +75,9 @@ describe("The Cyclon node", function () {
         var oldestNeighbour = {id: OTHER_ID, age: 100};
 
         beforeEach(function () {
-            neighbourSet.findOldestId.andReturn(OTHER_ID);
-            neighbourSet.selectShuffleSet.andReturn([oldestNeighbour].concat(requestSet));
-            neighbourSet.get.andReturn(oldestNeighbour);
+            neighbourSet.findOldestId.and.returnValue(OTHER_ID);
+            neighbourSet.selectShuffleSet.and.returnValue([oldestNeighbour].concat(requestSet));
+            neighbourSet.get.and.returnValue(oldestNeighbour);
         });
 
         it("should send the shuffle request to the oldest peer", function () {
@@ -90,11 +90,11 @@ describe("The Cyclon node", function () {
 
             var incrementHasBeenCalled = false;
 
-            neighbourSet.incrementAges.andCallFake(function () {
+            neighbourSet.incrementAges.and.callFake(function () {
                 incrementHasBeenCalled = true;
             });
 
-            neighbourSet.selectShuffleSet.andCallFake(function () {
+            neighbourSet.selectShuffleSet.and.callFake(function () {
                 expect(incrementHasBeenCalled).toBeTruthy();
                 return [];
             });
@@ -102,31 +102,25 @@ describe("The Cyclon node", function () {
             theNode.executeShuffle();
         });
 
-        it("should remove the last neighbour we shuffled with if it has not responded", function () {
-            runs(function() {
-                comms.sendShuffleRequest.andReturn(new Promise(function() {}));
-                theNode.executeShuffle();
-            });
+        it("should remove the last neighbour we shuffled with if it has not responded", function (done) {
+            comms.sendShuffleRequest.and.returnValue(new Promise(function() {}));
+            theNode.executeShuffle();
 
-            waits(10);
-
-            runs(function() {
+            setTimeout(function() {
                 theNode.executeShuffle();
                 expect(neighbourSet.remove).toHaveBeenCalledWith(OTHER_ID);
-            });
+                done();
+            }, 10);
         });
 
-        it("should remove the last neighbour we shuffled with if sending the shuffle fails", function () {
-            runs(function() {
-                comms.sendShuffleRequest.andReturn(Promise.reject(new Error("Something bad happened!")));
-                theNode.executeShuffle();
-            });
+        it("should remove the last neighbour we shuffled with if sending the shuffle fails", function (done) {
+            comms.sendShuffleRequest.and.returnValue(Promise.reject(new Error("Something bad happened!")));
+            theNode.executeShuffle();
 
-            waits(10);
-
-            runs(function() {
+            setTimeout(function() {
                 expect(neighbourSet.remove).toHaveBeenCalledWith(OTHER_ID);
-            });
+                done();
+            }, 10);
         });
     });
 
@@ -134,7 +128,7 @@ describe("The Cyclon node", function () {
     describe("when handling a shuffle request", function () {
 
         beforeEach(function () {
-            neighbourSet.randomSelection.andReturn(responseSet);
+            neighbourSet.randomSelection.and.returnValue(responseSet);
         });
 
         it("should respond with a random selection of its own neighbours", function () {
@@ -142,7 +136,7 @@ describe("The Cyclon node", function () {
         });
 
         it("should insert all new neighbours received into its set when there are enough empty slots", function () {
-            neighbourSet.size.andReturn(20);
+            neighbourSet.size.and.returnValue(20);
 
             theNode.handleShuffleRequest(OTHER_ID, requestSet);
 
@@ -161,7 +155,7 @@ describe("The Cyclon node", function () {
         });
 
         it("should attempt to merge pointers already present in its neighbour set", function () {
-            neighbourSet.contains.andReturn(true);
+            neighbourSet.contains.and.returnValue(true);
 
             theNode.handleShuffleRequest(OTHER_ID, requestSet);
 
@@ -170,7 +164,7 @@ describe("The Cyclon node", function () {
         });
 
         it("should remove neighbours sent in the response when the set is at capacity", function () {
-            neighbourSet.size.andReturn(50);
+            neighbourSet.size.and.returnValue(50);
 
             theNode.handleShuffleRequest(OTHER_ID, requestSet);
 
@@ -189,13 +183,13 @@ describe("The Cyclon node", function () {
         var fromPointer = {id: OTHER_ID, age: 0};
 
         beforeEach(function () {
-            neighbourSet.findOldestId.andReturn(OTHER_ID);
-            neighbourSet.selectShuffleSet.andReturn(requestSet);
+            neighbourSet.findOldestId.and.returnValue(OTHER_ID);
+            neighbourSet.selectShuffleSet.and.returnValue(requestSet);
             theNode.executeShuffle();
         });
 
         it("should not incorporate pointers already in its neighbour set", function () {
-            neighbourSet.contains.andReturn(true);
+            neighbourSet.contains.and.returnValue(true);
 
             theNode.handleShuffleResponse(fromPointer, responseSet);
 
@@ -203,7 +197,7 @@ describe("The Cyclon node", function () {
         });
 
         it("should remove neighbours sent in the request when the set is at capacity", function () {
-            neighbourSet.size.andReturn(50);
+            neighbourSet.size.and.returnValue(50);
 
             theNode.handleShuffleResponse(fromPointer, responseSet);
 
