@@ -1,6 +1,8 @@
 cyclon.p2p
 ==========
 
+[![Build Status](https://travis-ci.org/nicktindall/cyclon.p2p.svg?branch=master)](https://travis-ci.org/nicktindall/cyclon.p2p)
+
 A Javascript implementation of the Cyclon peer sampling protocol
 
 The Cyclon protocol is described in;
