@@ -29,6 +29,28 @@ describe("The neighbour set", function() {
         expect(theSet.contains(theNeighbour.id)).toBe(true);
     });
 
+    it("should throw an error when a neighbour is inserted with a missing ID", function() {
+
+        expect(function() {
+            var nullIdNeighbour = createNeighbour(123, 1);
+            nullIdNeighbour.id = null;
+            theSet.insert(nullIdNeighbour);
+        }).toThrow();
+
+        expect(function() {
+            var undefinedIdNeighbour = createNeighbour(123, 1);
+            delete undefinedIdNeighbour["id"];
+            theSet.insert(undefinedIdNeighbour);
+        }).toThrow();
+    });
+
+    it("should return a copy of its contents when getContents is called", function() {
+        theSet.insert(createNeighbour(123, 5));
+        var contents = theSet.getContents();
+        delete contents["123"];
+        expect(contents).toEqual({});
+        expect(theSet.contains("123")).toBeTruthy();
+    });
 
     describe("when finding the oldest neighbour's ID", function() {
         it("should correctly identify the oldest neighbour", function() {

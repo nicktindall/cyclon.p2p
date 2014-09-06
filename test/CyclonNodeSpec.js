@@ -3,6 +3,7 @@
 var Promise = require("bluebird");
 var CyclonNode = require("../lib/CyclonNode");
 var ClientMocks = require("./ClientMocks");
+var Utils = require("cyclon.p2p-common");
 
 describe("The Cyclon node", function () {
 
@@ -59,14 +60,53 @@ describe("The Cyclon node", function () {
         expect(theNode.getId()).toBe(ID);
     });
 
-    describe("when the neighbour set is empty", function() {
+    it("should throw an error if the shuffle size is greater than the neighbour cache size", function() {
+        expect(function() {
+            new CyclonNode(neighbourSet, 50, BOOTSTRAP_SIZE, 100, comms, bootstrap, TICK_INTERVAL_MS, metadataProviders, asyncExecService, logger, storage)
+        }).toThrow();
+    });
 
-        it("should stop shuffling and attempt to bootstrap", function() {
+    it("should make the NeighbourSet available", function() {
+        expect(theNode.getNeighbourSet()).toBe(neighbourSet);
+    });
+
+    describe("when the neighbour set is empty", function () {
+
+        it("should stop shuffling and attempt to bootstrap", function () {
 
             theNode.executeShuffle();
 
             expect(asyncExecService.clearInterval).toHaveBeenCalled();
             expect(bootstrap.getInitialPeerSet).toHaveBeenCalledWith(theNode, BOOTSTRAP_SIZE);
+        });
+    });
+
+    describe("when starting", function() {
+
+        beforeEach(function() {
+            theNode.start();
+        });
+
+        it("initializes the comms layer", function() {
+            expect(comms.initialize).toHaveBeenCalledWith(theNode, metadataProviders);
+        });
+
+        it("schedules a shuffle once every TICK_INTERVAL_MS milliseconds", function() {
+            expect(asyncExecService.setInterval).toHaveBeenCalledWith(theNode.executeShuffle, TICK_INTERVAL_MS);
+        });
+
+        describe("and the node is already started", function() {
+
+            beforeEach(function() {
+                comms.initialize.calls.reset();
+                asyncExecService.setInterval.calls.reset();
+                theNode.start();
+            });
+
+            it("doesn't initialize the comms later or schedule shuffles again", function() {
+                expect(comms.initialize).not.toHaveBeenCalled();
+                expect(asyncExecService.setInterval).not.toHaveBeenCalled();
+            });
         });
     });
 
@@ -103,10 +143,11 @@ describe("The Cyclon node", function () {
         });
 
         it("should remove the last neighbour we shuffled with if it has not responded", function (done) {
-            comms.sendShuffleRequest.and.returnValue(new Promise(function() {}));
+            comms.sendShuffleRequest.and.returnValue(new Promise(function () {
+            }));
             theNode.executeShuffle();
 
-            setTimeout(function() {
+            setTimeout(function () {
                 theNode.executeShuffle();
                 expect(neighbourSet.remove).toHaveBeenCalledWith(OTHER_ID);
                 done();
@@ -117,10 +158,55 @@ describe("The Cyclon node", function () {
             comms.sendShuffleRequest.and.returnValue(Promise.reject(new Error("Something bad happened!")));
             theNode.executeShuffle();
 
-            setTimeout(function() {
+            setTimeout(function () {
                 expect(neighbourSet.remove).toHaveBeenCalledWith(OTHER_ID);
                 done();
             }, 10);
+        });
+
+        describe("and the remote node is unreachable", function () {
+
+            it("emits an outgoing shuffleError event", function (done) {
+
+                comms.sendShuffleRequest.and.returnValue(Promise.reject(new Utils.UnreachableError("The remote node was unreachable")));
+                theNode.on("shuffleError", function (direction, remotePointer, type) {
+                    expect(direction).toBe("outgoing");
+                    expect(remotePointer).toBe(oldestNeighbour);
+                    expect(type).toBe("unreachable");
+                    done();
+                });
+                theNode.executeShuffle();
+            });
+        });
+
+        describe("and the shuffle times out", function () {
+
+            it("emits an outgoing shuffleTimeout event", function (done) {
+
+                comms.sendShuffleRequest.and.returnValue(Promise.reject(new Promise.TimeoutError("Timeout happened!")));
+                theNode.on("shuffleTimeout", function (direction, remotePointer, type) {
+                    expect(direction).toBe("outgoing");
+                    expect(remotePointer).toBe(oldestNeighbour);
+                    expect(type).toBeUndefined();
+                    done();
+                });
+                theNode.executeShuffle();
+            });
+        });
+
+        describe("and the shuffle is cancelled", function () {
+
+            it("emits an outgoing shuffleTimeout event", function (done) {
+
+                comms.sendShuffleRequest.and.returnValue(Promise.reject(new Promise.CancellationError("Cancellation happened!")));
+                theNode.on("shuffleTimeout", function (direction, remotePointer, type) {
+                    expect(direction).toBe("outgoing");
+                    expect(remotePointer).toBe(oldestNeighbour);
+                    expect(type).toBeUndefined();
+                    done();
+                });
+                theNode.executeShuffle();
+            });
         });
     });
 
