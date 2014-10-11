@@ -1,68 +1,28 @@
 'use strict';
+
 var cyclon = require("./lib");
-var gauss = require("gauss");
-var Util = require("cyclon.p2p-common");
 
-var NUM_NODES = 1000;
+var NUM_NODES = 50;
 var REPORT_INTERVAL_MS = 1000;
-
-var allNodes = {};
-var localBootstrap = new cyclon.LocalBootstrap(NUM_NODES);
-var logger = Util.consoleLogger();
-var nodes = [];
-var neighbourSets = [];
 var round = 0;
 
-for (var nodeId = 0; nodeId < NUM_NODES; nodeId++) {
-    var cyclonNode = cyclon.builder(new cyclon.LocalComms(String(nodeId), allNodes), localBootstrap)
-    		.withTickIntervalMs(1000)
-    		.withLogger(logger)
-    		.build();
+var localSimulation = new cyclon.LocalSimulation(NUM_NODES);
 
-    nodes.push(cyclonNode);
-    neighbourSets.push(cyclonNode.getNeighbourSet());
-}
+console.log("Starting Cyclon.p2p simulation of " + NUM_NODES + " nodes");
+console.log("Ideal entropy is " + localSimulation.getIdealEntropy());
+
+localSimulation.startSimulation();
 
 /**
- * Start all the nodes
+ * Start reporting
  */
-nodes.forEach(function(node) {
-    node.start();
-});
+setInterval(dumpNetworkStats, REPORT_INTERVAL_MS);
 
-function tick() {
+function dumpNetworkStats() {
     round++;
-    printNetworkStatistics();
+    var networkStats = localSimulation.getNetworkStatistics();
+
+    console.log(round + ": entropy (min=" + networkStats.entropy.min + ", mean=" + networkStats.entropy.mean + ", max=" + networkStats.entropy.max + "), "
+        + "in-degree (mean=" + networkStats.inDegree.mean + ", std.dev=" + networkStats.inDegree.standardDeviation + "), "
+        + "orphans=" + networkStats.orphanCount);
 }
-
-/**
- * Calculate the average inbound pointer count
- *
- * @returns {number}
- */
-function printNetworkStatistics() {
-    var counts = {};
-
-    neighbourSets.forEach(function (neighbourSet) {
-        for(var id in allNodes) {
-            var increment = neighbourSet.contains(id) ? 1 : 0;
-            counts[id] = counts[id] === undefined ? increment : counts[id] + increment;
-        }
-    });
-
-    var countsArray = [];
-    var orphanCount = 0;
-    for(var key in counts) {
-        var countForKey = counts[key];
-        countsArray.push(countForKey);
-        if(countForKey === 0) {
-            orphanCount++;
-        }
-    }
-
-    var statsVector = new gauss.Vector(countsArray);
-
-    logger.debug(round + ": Mean inbound = " + statsVector.mean() + ", st.dev = " + statsVector.stdev() + ", orphans: "+orphanCount);
-}
-
-setInterval(tick, REPORT_INTERVAL_MS);
