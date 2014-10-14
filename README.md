@@ -49,7 +49,7 @@ Return the string which the Comms layer is using to identify the local node.
 
 Usage
 -----
-On its own this package is not particularly useful unless you intend to create your own `Comms` and `Bootstrap` implementations. The [cyclon-p2p-rtc-comms](https://github.com/nicktindall/cyclon.p2p-rtc-comms) package provides a configurable implementation of the interfaces that will work in most modern browsers. 
+On its own this package is not particularly useful unless you intend to create your own `Comms` and `Bootstrap` implementations. The [cyclon-p2p-rtc-comms](https://github.com/nicktindall/cyclon.p2p-rtc-comms) package provides a configurable implementation of the interfaces that will work in modern Chrome and Firefox (and maybe Opera?) browsers. 
 
 A demonstration of the WebRTC implementation of cyclon.p2p can be found [here](http://cyclon-js-demo.herokuapp.com). Open a few tabs and watch the protocol work.
 
