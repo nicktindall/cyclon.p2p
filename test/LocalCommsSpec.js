@@ -47,7 +47,7 @@ describe("The LocalComms", function() {
         });
 
         it("executes the shuffle on the remote node, then handles the response on the local node", function() {
-            comms.sendShuffleRequest(localNode, DESTINATION_NODE_POINTER, SHUFFLE_SET);
+            comms.sendShuffleRequest(DESTINATION_NODE_POINTER, SHUFFLE_SET);
             expect(remoteNode.handleShuffleRequest).toHaveBeenCalledWith(null, SHUFFLE_SET);
             expect(localNode.handleShuffleResponse).toHaveBeenCalledWith(DESTINATION_NODE_POINTER, SHUFFLE_RESPONSE);
         });

@@ -123,7 +123,7 @@ describe("The Cyclon node", function () {
         it("should send the shuffle request to the oldest peer", function () {
             theNode.executeShuffle();
 
-            expect(comms.sendShuffleRequest).toHaveBeenCalledWith(theNode, oldestNeighbour, [POINTER].concat(requestSet));
+            expect(comms.sendShuffleRequest).toHaveBeenCalledWith(oldestNeighbour, [POINTER].concat(requestSet));
         });
 
         it("should increment the ages of all node pointers in the cache prior to selecting the shuffle set", function () {
