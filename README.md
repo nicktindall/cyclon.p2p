@@ -8,7 +8,7 @@ A Javascript implementation of the Cyclon peer sampling protocol
 
 The Cyclon protocol is described in;
 
-Voulgaris, S.; Gavidia, D. & van Steen, M. (2005), 'CYCLON: Inexpensive Membership Management for Unstructured P2P Overlays', J. Network Syst. Manage. 13 (2) .
+> Voulgaris, S.; Gavidia, D. & van Steen, M. (2005), 'CYCLON: Inexpensive Membership Management for Unstructured P2P Overlays', J. Network Syst. Manage. 13 (2).
 
 Overview
 --------
@@ -28,7 +28,7 @@ Get an initial set of peers. Returns a [Bluebird](https://github.com/petkaantono
 The Comms is the layer that takes care of a node's communication with other nodes. It is responsible for executing shuffles for the local node. Its interface is again quite simple.
 
 #### `initialize(localNode, metadataProviders)`
-Initialize the Comms instance.
+Initialize the Comms instance. This must be called before any attempt is made to do anything else.
 
 ##### Parameters
 * **localNode** A reference to the local CyclonNode.
