@@ -36,7 +36,7 @@
     "jasmine-node": "2.0.x"
   },
   "dependencies": {
-    "cyclon.p2p-common": "0.0.4",
+    "cyclon.p2p-common": "0.0.6",
     "bluebird": "2.3.x",
     "gauss": "0.2.12"
   }
