@@ -6,6 +6,11 @@ cyclon.p2p
 
 A Javascript implementation of the Cyclon peer sampling protocol
 
+The details and an analysis of the implementation can be found in;
+
+> N. Tindall and A. Harwood, "Peer-to-peer between browsers: cyclon protocol over WebRTC," Peer-to-Peer Computing (P2P), 2015 IEEE International Conference on, Boston, MA, 2015, pp. 1-5.
+>doi: 10.1109/P2P.2015.7328517
+
 The Cyclon protocol is described in;
 
 > Voulgaris, S.; Gavidia, D. & van Steen, M. (2005), 'CYCLON: Inexpensive Membership Management for Unstructured P2P Overlays', J. Network Syst. Manage. 13 (2).
