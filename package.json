@@ -9,8 +9,8 @@
     "sampling",
     "random"
   ],
-  "homepage": "https://gitub.com/nicktindall/cyclon/wiki",
-  "bugs": "https://github.com/nicktindall/cyclon/issues",
+  "homepage": "https://gitub.com/nicktindall/cyclon.p2p",
+  "bugs": "https://github.com/nicktindall/cyclon.p2p/issues",
   "license": "MIT",
   "author": {
     "name": "Nick Tindall",
@@ -26,7 +26,7 @@
   "main": "lib/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nicktindall/cyclon.git"
+    "url": "https://github.com/nicktindall/cyclon.p2p.git"
   },
   "scripts": {
     "test": "make test"
