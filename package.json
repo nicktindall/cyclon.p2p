@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "istanbul": "0.3.x",
-    "jasmine-node": "2.0.x"
+    "jasmine": "^2.99.0"
   },
   "dependencies": {
     "cyclon.p2p-common": "^0.1.1",
