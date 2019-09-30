@@ -1,9 +1,9 @@
 'use strict';
 
-var Promise = require("bluebird");
-var CyclonNode = require("../lib/CyclonNode");
-var ClientMocks = require("./ClientMocks");
-var Utils = require("cyclon.p2p-common");
+const {Promise} = require('bluebird');
+const {CyclonNodeImpl} = require('../lib/CyclonNodeImpl');
+const ClientMocks = require('./ClientMocks');
+const Utils = require('cyclon.p2p-common');
 
 describe("The Cyclon node", function () {
 
@@ -24,6 +24,7 @@ describe("The Cyclon node", function () {
         NUM_NEIGHBOURS = 50,
         SHUFFLE_SIZE = 10,
         BOOTSTRAP_SIZE = 66,
+        INTERVAL_ID = 99999,
         POINTER = {
             "id": ID,
             "seq": 55,
@@ -49,11 +50,12 @@ describe("The Cyclon node", function () {
         asyncExecService = ClientMocks.mockAsyncExecService();
         storage = ClientMocks.mockStorage();
         metadataProviders = {};
+        asyncExecService.setInterval.and.returnValue(INTERVAL_ID);
         bootstrap.getInitialPeerSet.and.returnValue(Promise.resolve([POINTER]));
         comms.createNewPointer.and.returnValue(POINTER);
         comms.getLocalId.and.returnValue(ID);
         comms.sendShuffleRequest.and.returnValue(Promise.resolve(null));
-        theNode = new CyclonNode(neighbourSet, NUM_NEIGHBOURS, BOOTSTRAP_SIZE, SHUFFLE_SIZE, comms, bootstrap, TICK_INTERVAL_MS, metadataProviders, asyncExecService, logger, storage);
+        theNode = new CyclonNodeImpl(neighbourSet, NUM_NEIGHBOURS, BOOTSTRAP_SIZE, SHUFFLE_SIZE, comms, bootstrap, TICK_INTERVAL_MS, metadataProviders, asyncExecService, logger);
     });
 
     it("should return it's ID", function () {
@@ -62,7 +64,7 @@ describe("The Cyclon node", function () {
 
     it("should throw an error if the shuffle size is greater than the neighbour cache size", function() {
         expect(function() {
-            new CyclonNode(neighbourSet, 50, BOOTSTRAP_SIZE, 100, comms, bootstrap, TICK_INTERVAL_MS, metadataProviders, asyncExecService, logger, storage)
+            new CyclonNodeImpl(neighbourSet, 50, BOOTSTRAP_SIZE, 100, comms, bootstrap, TICK_INTERVAL_MS, metadataProviders, asyncExecService, logger)
         }).toThrow();
     });
 
@@ -72,11 +74,15 @@ describe("The Cyclon node", function () {
 
     describe("when the neighbour set is empty", function () {
 
+        beforeEach(() => {
+            theNode.start();
+        });
+
         it("should stop shuffling and attempt to bootstrap", function () {
 
             theNode.executeShuffle();
 
-            expect(asyncExecService.clearInterval).toHaveBeenCalled();
+            expect(asyncExecService.clearInterval).toHaveBeenCalledWith(INTERVAL_ID);
             expect(bootstrap.getInitialPeerSet).toHaveBeenCalledWith(theNode, BOOTSTRAP_SIZE);
         });
     });
@@ -92,7 +98,7 @@ describe("The Cyclon node", function () {
         });
 
         it("schedules a shuffle once every TICK_INTERVAL_MS milliseconds", function() {
-            expect(asyncExecService.setInterval).toHaveBeenCalledWith(theNode.executeShuffle, TICK_INTERVAL_MS);
+            expect(asyncExecService.setInterval).toHaveBeenCalledWith(jasmine.any(Function), TICK_INTERVAL_MS);
         });
 
         describe("and the node is already started", function() {

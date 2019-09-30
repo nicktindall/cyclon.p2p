@@ -4,6 +4,7 @@ node_js:
 deploy:
   provider: npm
   email: nick@tindall.id.au
+  skip_cleanup: true
   api_key:
     secure: tTlyt4Zmwrsib450+Gntvu7y+TKMKPvZCQb1ssKEfdGW4nkG/R4rsBIvBRyR3YArW1c2mcWqzwmbL2z/h5wvGBIfl8j422cyXp4I/0Y0T4i4HQfnEcQtVRJF3DM0TV/CtVSNephCjCf6L7cRtQc/NXopJCbLrQL/hvgU3rezpuo=
   on:

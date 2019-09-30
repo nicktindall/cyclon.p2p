@@ -1,7 +1,7 @@
 'use strict';
 
-var NeighbourSet = require("../lib/NeighbourSet");
-var ClientMocks = require("./ClientMocks");
+const {NeighbourSet} = require('../lib/NeighbourSet');
+const ClientMocks = require('./ClientMocks');
 
 describe("The neighbour set", function() {
 
@@ -45,7 +45,7 @@ describe("The neighbour set", function() {
     });
 
     it("should return a copy of its contents when getContents is called", function() {
-        theSet.insert(createNeighbour(123, 5));
+        theSet.insert(createNeighbour("123", 5));
         var contents = theSet.getContents();
         delete contents["123"];
         expect(contents).toEqual({});

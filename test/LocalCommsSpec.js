@@ -1,7 +1,7 @@
 'use strict';
 
-var ClientMocks = require("./ClientMocks");
-var LocalComms = require("../lib/LocalComms");
+const ClientMocks = require('./ClientMocks');
+const {LocalComms} = require('../lib/LocalComms');
 
 describe("The LocalComms", function() {
 
@@ -48,7 +48,7 @@ describe("The LocalComms", function() {
 
         it("executes the shuffle on the remote node, then handles the response on the local node", function() {
             comms.sendShuffleRequest(DESTINATION_NODE_POINTER, SHUFFLE_SET);
-            expect(remoteNode.handleShuffleRequest).toHaveBeenCalledWith(null, SHUFFLE_SET);
+            expect(remoteNode.handleShuffleRequest).toHaveBeenCalledWith({id: LOCAL_ID, seq: 0, age: 0, metadata: {}}, SHUFFLE_SET);
             expect(localNode.handleShuffleResponse).toHaveBeenCalledWith(DESTINATION_NODE_POINTER, SHUFFLE_RESPONSE);
         });
     });
@@ -61,7 +61,8 @@ describe("The LocalComms", function() {
         expect(comms.createNewPointer("metadata")).toEqual({
             id: LOCAL_ID,
             metadata: {},
-            age: 0
+            age: 0,
+            seq: 0
         });
     })
 });

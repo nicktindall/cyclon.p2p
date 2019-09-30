@@ -1,7 +1,7 @@
 'use strict';
 
-var ClientMocks = require("./ClientMocks");
-var LocalBootstrap = require("../lib/LocalBootstrap");
+const ClientMocks = require('./ClientMocks');
+const {LocalBootstrap} = require('../lib/LocalBootstrap');
 
 describe("The local bootstrap", function() {
 
@@ -14,7 +14,7 @@ describe("The local bootstrap", function() {
     it("returns the next peer in sequence when bootstrapping", function(done) {
         localNode.getId.and.returnValue("5");
         new LocalBootstrap(10).getInitialPeerSet(localNode, 5).then(function(result) {
-            expect(result).toEqual([{id:"6", age:0}]);
+            expect(result).toEqual([{id:"6", age:0, seq:0, metadata: {}}]);
             done();
         });
     });

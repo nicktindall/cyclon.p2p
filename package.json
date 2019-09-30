@@ -24,20 +24,27 @@
     }
   ],
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/nicktindall/cyclon.p2p.git"
   },
   "scripts": {
-    "test": "make test"
+    "build": "tsc",
+    "test": "make test",
+    "clean": "make clean",
+    "prepare": "npm run build"
   },
   "devDependencies": {
+    "@types/events": "^3.0.0",
     "istanbul": "0.3.x",
-    "jasmine": "^2.99.0"
+    "jasmine": "^2.99.0",
+    "typescript": "^3.6.3"
   },
   "dependencies": {
-    "cyclon.p2p-common": "^0.1.1",
+    "@types/bluebird": "^2.0.33",
     "bluebird": "2.3.x",
+    "cyclon.p2p-common": "^0.1.6",
     "gauss": "0.2.12"
   }
 }
