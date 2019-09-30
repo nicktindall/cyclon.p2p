@@ -7,6 +7,7 @@ import {LocalBootstrap} from './LocalBootstrap';
 import {LocalSimulation} from './LocalSimulation';
 import {Bootstrap} from './Bootstrap';
 import {CyclonNode} from './CyclonNode';
+import {CyclonNodePointer} from "./CyclonNodePointer";
 
 const DEFAULT_NUM_NEIGHBOURS = 20;
 const DEFAULT_BOOTSTRAP_SIZE = 1;
@@ -89,4 +90,4 @@ export function builder(comms: Comms, bootstrap: Bootstrap): CyclonNodeBuilder {
     return new CyclonNodeBuilder(comms, bootstrap);
 }
 
-export {CyclonNode, CyclonNodeImpl, Comms, MetadataProvider, Bootstrap, LocalComms, LocalBootstrap, NeighbourSet, LocalSimulation};
+export {CyclonNode, CyclonNodeImpl, Comms, CyclonNodePointer, MetadataProvider, Bootstrap, LocalComms, LocalBootstrap, NeighbourSet, LocalSimulation};
