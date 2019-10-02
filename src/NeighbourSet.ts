@@ -15,7 +15,7 @@ export class NeighbourSet extends EventEmitter {
      * Return a copy of the contents map
      */
     getContents(): Map<string, CyclonNodePointer> {
-        return JSON.parse(JSON.stringify(this.neighbours));
+        return new Map(this.neighbours);
     }
 
     /**

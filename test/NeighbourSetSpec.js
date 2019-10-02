@@ -47,8 +47,8 @@ describe("The neighbour set", function() {
     it("should return a copy of its contents when getContents is called", function() {
         theSet.insert(createNeighbour("123", 5));
         var contents = theSet.getContents();
-        delete contents["123"];
-        expect(contents).toEqual({});
+        contents.delete("123");
+        expect(contents.size).toEqual(0);
         expect(theSet.contains("123")).toBeTruthy();
     });
 
