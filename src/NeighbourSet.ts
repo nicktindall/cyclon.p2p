@@ -40,7 +40,8 @@ export class NeighbourSet extends EventEmitter {
      * Remove the neighbour with the specified ID from the set
      */
     remove(neighbourId: string): void {
-        const removed = this.neighbours.delete(neighbourId);
+        const removed = this.neighbours.get(neighbourId);
+        this.neighbours.delete(neighbourId);
         this.emit("change", "remove", removed);
     }
 
