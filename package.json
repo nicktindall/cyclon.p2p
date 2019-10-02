@@ -44,7 +44,6 @@
     "@types/bluebird": "^2.0.33",
     "@types/node": "^10.14.19",
     "bluebird": "2.3.x",
-    "cyclon.p2p-common": "^0.1.8",
-    "gauss": "0.2.12"
+    "cyclon.p2p-common": "^0.1.8"
   }
 }

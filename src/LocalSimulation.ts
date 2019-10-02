@@ -1,4 +1,3 @@
-import {Collection, Vector} from 'gauss';
 import {builder} from './index';
 import {LocalComms} from './LocalComms'
 import {NeighbourSet} from './NeighbourSet'
@@ -66,27 +65,27 @@ export class LocalSimulation {
      * Get the stats for the current state of the network
      */
     getNetworkStatistics() {
-        const entropyValuesVector = this.getEntropyValues();
-        const inDegreeVector = this.getInDegreeValues();
+        const entropyValues = this.getEntropyValues();
+        const inDegreeValues = this.getInDegreeValues();
 
         return {
             entropy: {
-                min: entropyValuesVector.min(),
-                mean: entropyValuesVector.mean(),
-                max: entropyValuesVector.max()
+                min: Math.min(...entropyValues),
+                mean: LocalSimulation.mean(entropyValues),
+                max: Math.max(...entropyValues)
             },
             inDegree: {
-                mean: inDegreeVector.mean(),
-                standardDeviation: inDegreeVector.stdev()
+                mean: LocalSimulation.mean(inDegreeValues),
+                standardDeviation: LocalSimulation.standardDeviation(inDegreeValues)
             },
-            orphanCount: inDegreeVector.frequency(0)
+            orphanCount: inDegreeValues.filter(val => val === 0).length
         };
     }
 
     /**
      * Get a vector containing the in-degree of every node in the network
      */
-    getInDegreeValues(): Vector {
+    getInDegreeValues(): number[] {
         const inDegrees: { [id: string]: number } = {};
 
         this.neighbourSets.forEach((neighbourSet) => {
@@ -102,20 +101,20 @@ export class LocalSimulation {
             inDegreesArray.push(countForKey);
         }
 
-        return new Vector(inDegreesArray);
+        return inDegreesArray;
     }
 
     /**
      * Get a vector containing the peer stream entropy of every node in the network
      */
-    getEntropyValues(): Vector {
+    getEntropyValues(): number[] {
         const entropyValues = [];
 
         for (const nodeId in this.peerSequences) {
             entropyValues.push(this.calculateEntropyForNode(nodeId));
         }
 
-        return new Vector(entropyValues);
+        return entropyValues;
     }
 
     /**
@@ -156,19 +155,40 @@ export class LocalSimulation {
     private static calculateEntropy(peerSequence: string[]): number {
         const sequenceLength = peerSequence.length;
 
-        const counts = new Collection(peerSequence).distribution();
-        const distinctIds = Object.keys(counts);
+        const counts = LocalSimulation.frequency(peerSequence);
+        const distinctIds = Array.from(counts.keys());
         let entropy: number = 0;
         for (let i = 0, distinctIdCount = distinctIds.length; i < distinctIdCount; i++) {
             const currentId = distinctIds[i];
-            const probability = counts[currentId] / sequenceLength;
+            const probability = counts.get(currentId) as number / sequenceLength;
             entropy = entropy + (probability * LocalSimulation.log2(probability));
         }
 
         return -1 * entropy;
     }
 
-    private static log2(number: number) {
+    private static log2(number: number): number {
         return Math.log(number) / Math.log(2);
+    }
+
+    public static mean(values: number[]): number | undefined {
+        if (values.length === 0) {
+            return undefined;
+        }
+        return values.reduce((p, n) => p + n, 0) / values.length;
+    }
+
+    public static standardDeviation(values: number[]): number | undefined {
+        if (values.length === 0) {
+            return undefined;
+        }
+        const meanOfValues = LocalSimulation.mean(values) as number;
+        return Math.sqrt(LocalSimulation.mean(values.map(val => Math.pow(val - meanOfValues, 2))) as number);
+    }
+
+    public static frequency(values: string[]): Map<string, number> {
+        return new Map([...new Set(values)].map(
+            x => [x, values.filter(y => y === x).length]
+        ));
     }
 }
