@@ -36,15 +36,15 @@
     "prepare": "npm run build"
   },
   "devDependencies": {
-    "@types/events": "^3.0.0",
     "istanbul": "0.3.x",
     "jasmine": "^2.99.0",
     "typescript": "^3.6.3"
   },
   "dependencies": {
     "@types/bluebird": "^2.0.33",
+    "@types/node": "^10.14.19",
     "bluebird": "2.3.x",
-    "cyclon.p2p-common": "^0.1.6",
+    "cyclon.p2p-common": "^0.1.8",
     "gauss": "0.2.12"
   }
 }
