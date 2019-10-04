@@ -1,7 +1,8 @@
+import {EventEmitter} from 'events';
 import {NeighbourSet} from './NeighbourSet';
 import {CyclonNodePointer} from "./CyclonNodePointer";
 
-export interface CyclonNode {
+export interface CyclonNode extends EventEmitter {
 
     getId(): string;
 
