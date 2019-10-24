@@ -23,7 +23,7 @@ The cyclon.p2p implementation has two dependencies, a `Bootstrap` and a `Comms` 
 The purpose of the `Bootstrap` is to retrieve some peers to initially populate a node's neighbour cache. Its interface is quite simple.
 
 #### `getInitialPeerSet(localNode, maxPeers)`
-Get an initial set of peers. Returns a [Bluebird](https://github.com/petkaantonov/bluebird) promise that will resolve to a set of peers no greater than the specified limit.
+Get an initial set of peers. Returns a Promise that will resolve to a set of peers no greater than the specified limit.
 
 ##### Parameters
 * **localNode** The CyclonNode that is requesting the peers.
