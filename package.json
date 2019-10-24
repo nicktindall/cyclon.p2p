@@ -38,12 +38,10 @@
   "devDependencies": {
     "istanbul": "0.3.x",
     "jasmine": "^2.99.0",
-    "typescript": "^3.6.3"
+    "typescript": "^3.6.4"
   },
   "dependencies": {
-    "@types/bluebird": "^2.0.33",
-    "@types/node": "^10.14.19",
-    "bluebird": "2.3.x",
-    "cyclon.p2p-common": "^0.1.8"
+    "@types/node": "^10.14.22",
+    "cyclon.p2p-common": "^0.1.11"
   }
 }

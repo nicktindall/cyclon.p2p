@@ -1,11 +1,10 @@
 import {EventEmitter} from 'events';
-import Promise from 'bluebird';
-import {Logger, AsyncExecService, UnreachableError} from 'cyclon.p2p-common';
+import {AsyncExecService, Logger, TimeoutError, UnreachableError} from 'cyclon.p2p-common';
 import {Comms, MetadataProvider} from './Comms';
 import {CyclonNode} from './CyclonNode';
 import {Bootstrap} from './Bootstrap';
 import {NeighbourSet} from './NeighbourSet';
-import {CyclonNodePointer} from "./CyclonNodePointer";
+import {CyclonNodePointer} from './CyclonNodePointer';
 
 export class CyclonNodeImpl extends EventEmitter implements CyclonNode {
 
@@ -22,12 +21,12 @@ export class CyclonNodeImpl extends EventEmitter implements CyclonNode {
                 private readonly comms: Comms,
                 private readonly bootstrapper: Bootstrap,
                 private readonly tickIntervalMs: number,
-                private readonly metadataProviders: {[key:string]: MetadataProvider},
+                private readonly metadataProviders: { [key: string]: MetadataProvider },
                 private readonly asyncExecService: AsyncExecService,
                 private readonly logger: Logger) {
         super();
         if (shuffleSize > numNeighbours) {
-            throw new Error("Shuffle size cannot be larger than the neighbour cache size!");
+            throw new Error('Shuffle size cannot be larger than the neighbour cache size!');
         }
 
         this.id = comms.getLocalId();
@@ -55,14 +54,14 @@ export class CyclonNodeImpl extends EventEmitter implements CyclonNode {
             this.startShuffling();
             this.started = true;
         } else {
-            this.logger.error("You can't start the node twice, are you insane!?");
+            this.logger.error('You can\'t start the node twice, are you insane!?');
         }
     }
 
     /**
      * Execute an "enhanced shuffle" with another node in the cache
      */
-    private executeShuffle(): void {
+    private async executeShuffle(): Promise<void> {
 
         //
         // If we haven't heard back from our last shuffle request, delete that neighbour
@@ -102,32 +101,30 @@ export class CyclonNodeImpl extends EventEmitter implements CyclonNode {
             this.lastShuffleSet = shuffleSet;
 
             const outgoingPointer = <CyclonNodePointer>this.neighbours.get(oldestNeighbourId);
-            this.emit("shuffleStarted", "outgoing", outgoingPointer);
-            this.comms.sendShuffleRequest(outgoingPointer, shuffleSet)
-                .then(() => {
-                    this.emit("shuffleCompleted", "outgoing", outgoingPointer);
-                })
-                .catch(UnreachableError, () => {
-                    this.emit("shuffleError", "outgoing", outgoingPointer, "unreachable");
-                })
-                .catch(Promise.TimeoutError, (e) => {
-                    console.warn(e.message);
-                    this.emit("shuffleTimeout", "outgoing", outgoingPointer);
-                })
-                .catch(Promise.CancellationError, () => {
-                    this.emit("shuffleTimeout", "outgoing", outgoingPointer);
-                })
-                .catch((error) => {
-                    this.logger.error("An unexpected error occurred sending a shuffle request to " + oldestNeighbourId, error);
-                    this.emit("shuffleError", "outgoing", outgoingPointer, "unknown");
-                })
-                .then(() => this.deleteLastShuffleState());
+
+            this.emit('shuffleStarted', 'outgoing', outgoingPointer);
+            try {
+                await this.comms.sendShuffleRequest(outgoingPointer, shuffleSet);
+                this.emit('shuffleCompleted', 'outgoing', outgoingPointer);
+            } catch (error) {
+                if (error instanceof UnreachableError) {
+                    this.emit('shuffleError', 'outgoing', outgoingPointer, 'unreachable');
+                } else if (error instanceof TimeoutError) {
+                    console.warn(error.message);
+                    this.emit('shuffleTimeout', 'outgoing', outgoingPointer);
+                } else {
+                    this.logger.error('An unexpected error occurred sending a shuffle request to ' + oldestNeighbourId, error);
+                    this.emit('shuffleError', 'outgoing', outgoingPointer, 'unknown');
+                }
+            } finally {
+                this.deleteLastShuffleState();
+            }
         } else {
             //
             // Our neighbour cache is empty, try and bootstrap
             //
             this.stopShuffling();
-            this.bootstrapNeighbourCache();
+            await this.bootstrapNeighbourCache();
         }
     };
 
@@ -178,19 +175,18 @@ export class CyclonNodeImpl extends EventEmitter implements CyclonNode {
     /**
      * Bootstrap the neighbour cache and begin shuffling
      */
-    bootstrapNeighbourCache() {
-        this.logger.info("Neighbour cache empty, attempting to bootstrap");
-        this.emit("attemptingBootstrap");
-        this.bootstrapper.getInitialPeerSet(this, this.bootstrapSize).then((initialPeerSet) => {
-                initialPeerSet.forEach((peer) => {
-                    this.neighbours.insert(peer);
-                });
-
-                this.startShuffling();
-            })
-            .catch((error:any) => {
-                this.logger.error("Error bootstrapping peers", error);
+    async bootstrapNeighbourCache(): Promise<void> {
+        this.logger.info('Neighbour cache empty, attempting to bootstrap');
+        this.emit('attemptingBootstrap');
+        try {
+            const initialPeerSet = await this.bootstrapper.getInitialPeerSet(this, this.bootstrapSize);
+            initialPeerSet.forEach((peer) => {
+                this.neighbours.insert(peer);
             });
+            this.startShuffling();
+        } catch (error) {
+            this.logger.error('Error bootstrapping peers', error);
+        }
     }
 
     /**
@@ -226,7 +222,7 @@ export class CyclonNodeImpl extends EventEmitter implements CyclonNode {
                     if (toRemove !== undefined) {
                         this.neighbours.remove(toRemove.id);
                     } else {
-                        this.logger.warn("Not enough neighboursToReplace");
+                        this.logger.warn('Not enough neighboursToReplace');
                     }
                 }
                 this.neighbours.insert(item);

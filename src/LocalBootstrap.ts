@@ -1,4 +1,3 @@
-import {Promise} from 'bluebird';
 import {CyclonNode} from './CyclonNode';
 import {Bootstrap} from './Bootstrap';
 import {CyclonNodePointer} from "./CyclonNodePointer";

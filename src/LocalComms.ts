@@ -1,5 +1,3 @@
-import {Promise} from 'bluebird';
-
 import {Comms, MetadataProvider} from './Comms';
 import {CyclonNode} from './CyclonNode';
 import {CyclonNodePointer} from "./CyclonNodePointer";

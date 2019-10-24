@@ -1,9 +1,8 @@
 'use strict';
 
-const {Promise} = require('bluebird');
 const {CyclonNodeImpl} = require('../lib/CyclonNodeImpl');
 const ClientMocks = require('./ClientMocks');
-const Utils = require('cyclon.p2p-common');
+const {UnreachableError, TimeoutError} = require('cyclon.p2p-common');
 
 describe("The Cyclon node", function () {
 
@@ -174,7 +173,7 @@ describe("The Cyclon node", function () {
 
             it("emits an outgoing shuffleError event", function (done) {
 
-                comms.sendShuffleRequest.and.returnValue(Promise.reject(new Utils.UnreachableError("The remote node was unreachable")));
+                comms.sendShuffleRequest.and.returnValue(Promise.reject(new UnreachableError("The remote node was unreachable")));
                 theNode.on("shuffleError", function (direction, remotePointer, type) {
                     expect(direction).toBe("outgoing");
                     expect(remotePointer).toBe(oldestNeighbour);
@@ -189,22 +188,7 @@ describe("The Cyclon node", function () {
 
             it("emits an outgoing shuffleTimeout event", function (done) {
 
-                comms.sendShuffleRequest.and.returnValue(Promise.reject(new Promise.TimeoutError("Timeout happened!")));
-                theNode.on("shuffleTimeout", function (direction, remotePointer, type) {
-                    expect(direction).toBe("outgoing");
-                    expect(remotePointer).toBe(oldestNeighbour);
-                    expect(type).toBeUndefined();
-                    done();
-                });
-                theNode.executeShuffle();
-            });
-        });
-
-        describe("and the shuffle is cancelled", function () {
-
-            it("emits an outgoing shuffleTimeout event", function (done) {
-
-                comms.sendShuffleRequest.and.returnValue(Promise.reject(new Promise.CancellationError("Cancellation happened!")));
+                comms.sendShuffleRequest.and.returnValue(Promise.reject(new TimeoutError("Timeout happened!")));
                 theNode.on("shuffleTimeout", function (direction, remotePointer, type) {
                     expect(direction).toBe("outgoing");
                     expect(remotePointer).toBe(oldestNeighbour);
